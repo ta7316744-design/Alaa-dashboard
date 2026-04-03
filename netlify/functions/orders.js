@@ -1,25 +1,41 @@
-makach mconst fetch = require('node-fetch');
+const fetch = require('node-fetch');
+
 exports.handler = async (event) => {
-  const EMAIL    = process.env.WATI_EMAIL || '';
-  const PASSWORD = process.env.WATI_PASSWORD || '';
-  const params   = event.queryStringParameters || {};
-  const today    = new Date();
-  const week     = new Date(today - 7*86400000);
+  const params    = event.queryStringParameters || {};
+  const today     = new Date();
+  const week      = new Date(today - 7*86400000);
   const from_date = params.from || week.toISOString().split('T')[0];
   const to_date   = params.to   || today.toISOString().split('T')[0];
-  // Login
-  const token = process.env.WATI_TOKEN || '';
+
+  let token = '';
+  try {
+    const r = await fetch('https://api.wati.ly/auth/refresh', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.WATI_REFRESH_TOKEN || ''}`
+      }
+    });
+    if (r.ok) {
+      const d = await r.json();
+      token = d.accessToken || '';
+    }
+  } catch(e) {}
+
+  if (!token) token = process.env.WATI_TOKEN || '';
+
   const headers = {
     'Accept': 'application/json',
     'Authorization': `Bearer ${token}`,
     'Origin': 'https://app.wati.ly',
     'Referer': 'https://app.wati.ly/'
   };
+
   let orders = [];
   let page = 1;
   while (page <= 200) {
     try {
-      const r = await fetch(`https://api.wati.ly/orders?page=${page}&limit=50`, { headers, timeout: 8000 });
+      const r = await fetch(`https://api.wati.ly/orders?page=${page}&limit=50`, { headers });
       if (!r.ok) break;
       const data = await r.json();
       const arr = data.data || [];
@@ -42,18 +58,4 @@ exports.handler = async (event) => {
             wilaya:   addr.city || '—',
           });
         } else if (updated < from_date) {
-          stop = true; break;
-        }
-      }
-      if (stop) break;
-      const totalPages = data.totalPages || 1;
-      if (page >= totalPages) break;
-      page++;
-    } catch(e) { break; }
-  }
-  return {
-    statusCode: 200,
-    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    body: JSON.stringify({ orders, total: orders.length, last_update: new Date().toISOString(), logged_in: !!token })
-  };
-};
+          sto
