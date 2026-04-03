@@ -10,18 +10,7 @@ exports.handler = async (event) => {
   const to_date   = params.to   || today.toISOString().split('T')[0];
 
   // Login
-  let token = process.env.WATI_TOKEN || '';
-  try {
-    const login = await fetch('https://app.wati.ly/api/account/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: EMAIL, password: PASSWORD })
-    });
-    if (login.ok) {
-      const d = await login.json();
-      token = d.token || d.accessToken || d.access_token || token;
-    }
-  } catch(e) {}
+  const token = process.env.WATI_TOKEN || '';
 
   const headers = {
     'Accept': 'application/json',
