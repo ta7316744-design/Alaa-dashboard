@@ -33,7 +33,7 @@ exports.handler = async (event) => {
 
   let orders = [];
   let page = 1;
-  while (page <= 200) {
+  while (page <= 20) {
     try {
       const r = await fetch(`https://api.wati.ly/orders?page=${page}&limit=50`, { headers });
       if (!r.ok) break;
