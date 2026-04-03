@@ -17,7 +17,7 @@ exports.handler = async (event) => {
         'Authorization': `Bearer ${process.env.WATI_REFRESH_TOKEN || ''}`
       }
     });
-    if (refresh.ok) {
+    if (refresh.ok) { 
       const d = await refresh.json();
       token = d.accessToken || d.token || '';
     }
