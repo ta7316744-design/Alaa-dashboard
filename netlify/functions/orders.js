@@ -58,4 +58,20 @@ exports.handler = async (event) => {
             wilaya:   addr.city || '—',
           });
         } else if (updated < from_date) {
-          sto
+       sto
+          stop = true; break;
+        }
+      }
+      if (stop) break;
+      const totalPages = data.totalPages || 1;
+      if (page >= totalPages) break;
+      page++;
+    } catch(e) { break; }
+  }
+
+  return {
+    statusCode: 200,
+    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+    body: JSON.stringify({ orders, total: orders.length, last_update: new Date().toISOString(), logged_in: !!token })
+  };
+};
