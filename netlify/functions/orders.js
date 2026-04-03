@@ -58,7 +58,6 @@ exports.handler = async (event) => {
             wilaya:   addr.city || '—',
           });
         } else if (updated < from_date) {
-       sto
           stop = true; break;
         }
       }
