@@ -45,9 +45,9 @@ export default {
           if (!arr.length) break;
           let stop = false;
           for (const o of arr) {
-            const updated = (o.updatedUtc || '').slice(0, 10);
+            const updated = (o.createdUtc || '').slice(0, 10);
             const created = (o.createdUtc || '').slice(0, 10);
-            if (updated >= from_date && updated <= to_date) {
+if (updated >= from_date && updated <= to_date) {
               const c = o.customer || {}, addr = o.incomingShippingAddress || {};
               orders.push({
                 id: o.trackingId || '—',
@@ -59,7 +59,7 @@ export default {
                 wilaya: addr.city || '—',
               });
             } else if (updated < from_date) { stop = true; break; }
-          }
+          }} else if (updated < from_date) {
           if (stop) break;
           if (page >= (data.totalPages || 1)) break;
           page++;
