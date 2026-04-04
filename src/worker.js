@@ -32,8 +32,7 @@ export default {
       const headers = {
         'Accept': 'application/json',
         'Authorization': `Bearer ${token}`,
-        'Origin': 'https://app.wati.ly',
-        'Referer': 'https://app.wati.ly/'
+      
       };
 
       let orders = [], page = 1;
