@@ -20,15 +20,15 @@ export default {
       const to_date   = url.searchParams.get('to')   || new Date().toISOString().split('T')[0];
 
       let token = '';
-      try {
-        const r = await fetch('https://api.wati.ly/auth/refresh', {
-          method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${env.WATI_REFRESH_TOKEN}` },
-        body: JSON.stringify({ req: env.WATI_REFRESH_TOKEN })
-      });
-        if (r.ok) { const d = await r.json(); token = d.accessToken || ''; }
-        else { console.log('Refresh failed:', r.status, await r.text()); }
-      } catch(e) {}
+     try {
+  const r = await fetch('https://api.wati.ly/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: env.WATI_EMAIL, password: env.WATI_PASSWORD })
+  });
+  if (r.ok) { const d = await r.json(); token = d.access_token || d.accessToken || ''; }
+  else { console.log('Login failed:', r.status, await r.text()); }
+} catch(e) {}
 
       const headers = {
         'Accept': 'application/json',
