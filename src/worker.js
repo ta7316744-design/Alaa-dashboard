@@ -24,8 +24,7 @@ export default {
   const r = await fetch('https://api.wati.ly/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: env.WATI_EMAIL, password: env.WATI_PASSWORD })
-  });
+    body: JSON.stringify({ username: env.WATI_EMAIL, password: env.WATI_PASSWORD })  });
   if (r.ok) { const d = await r.json(); token = d.access_token || d.accessToken || ''; }
   else { console.log('Login failed:', r.status, await r.text()); }
 } catch(e) {}
