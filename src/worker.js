@@ -23,8 +23,9 @@ export default {
       try {
         const r = await fetch('https://api.wati.ly/auth/refresh', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${env.WATI_REFRESH_TOKEN}` }
-        });
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${env.WATI_REFRESH_TOKEN}` },
+        body: JSON.stringify({ req: env.WATI_REFRESH_TOKEN })
+      });
         if (r.ok) { const d = await r.json(); token = d.accessToken || ''; }
         else { console.log('Refresh failed:', r.status, await r.text()); }
       } catch(e) {}
