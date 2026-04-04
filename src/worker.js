@@ -27,7 +27,6 @@ export default {
         });
         if (r.ok) { const d = await r.json(); token = d.accessToken || ''; }
       } catch(e) {}
-      if (!token) token = env.WATI_TOKEN || '';
 
       const headers = {
         'Accept': 'application/json',
