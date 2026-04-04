@@ -58,8 +58,10 @@ if (updated >= from_date && updated <= to_date) {
                 date: updated, created,
                 wilaya: addr.city || '—',
               });
-            } else if (updated < from_date) { stop = true; break; }
-          }} else if (updated < from_date) {
+     } else if (updated < from_date) {
+              stop = true; break;
+            }
+          }
           if (stop) break;
           if (page >= (data.totalPages || 1)) break;
           page++;
