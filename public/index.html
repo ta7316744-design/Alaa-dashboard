@@ -296,11 +296,10 @@ function renderCampaigns(camps){
 }
 
 async function runAI(){
-  const days=parseInt(document.getElementById('aiPeriod').value);
-  const aiFrom=document.getElementById('aiFrom').value;
-  const aiTo=document.getElementById('aiTo').value;
-  const from=aiFrom||fmt(new Date(Date.now()-days*86400000));
-  const to=aiTo||fmt(new Date());
+ const period=document.getElementById('aiPeriod').value;
+ const days=parseInt(period)||7;
+ const from=period==='custom'?document.getElementById('aiFrom').value:fmt(new Date(Date.now()-days*86400000));
+ const to=period==='custom'?document.getElementById('aiTo').value:fmt(new Date());
   document.getElementById('aiEmpty').style.display='none';
   document.getElementById('aiBox').style.display='none';
   document.getElementById('aiStats').style.display='none';
