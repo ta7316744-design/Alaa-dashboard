@@ -204,7 +204,11 @@ window.onload=()=>{
   document.getElementById('aiTo').value=fmt(today);
   loadAll(); setupDrop();
 };
-
+function toggleAiDates(){
+  const custom=document.getElementById('aiPeriod').value==='custom';
+  document.getElementById('aiFromGroup').style.display=custom?'flex':'none';
+  document.getElementById('aiToGroup').style.display=custom?'flex':'none';
+}
 function fmt(d){return d.toISOString().split('T')[0];}
 function fmtNum(n){return Number(n).toLocaleString('ar',{maximumFractionDigits:0});}
 function loadAll(){loadOrders();loadFacebook();}
