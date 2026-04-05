@@ -138,9 +138,11 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;h
 
 <!-- AI -->
 <div class="page" id="page-analysis">
-  <div class="filters">
-    <div class="fg"><label>الفترة</label><select id="aiPeriod"><option value="7">آخر 7 أيام</option><option value="14">آخر 14 يوم</option><option value="30">آخر 30 يوم</option></select></div>
-    <button class="btn btn-primary" onclick="runAI()" id="aiBtn">🤖 تحليل بالذكاء الاصطناعي</button>
+ <div class="filters">
+  <div class="fg"><label>الفترة</label><select id="aiPeriod"><option value="7">آخر 7 أيام</option><option value="14">آخر 14 يوم</option><option value="30">آخر 30 يوم</option></select></div>
+  <div class="fg"><label>من تاريخ</label><input type="date" id="aiFrom"/></div>
+  <div class="fg"><label>إلى تاريخ</label><input type="date" id="aiTo"/></div>
+  <button class="btn btn-primary" onclick="runAI()" id="aiBtn">🤖 تحليل بالذكاء الاصطناعي</button>
   </div>
   <div class="stats-grid" id="aiStats" style="display:none">
     <div class="stat-card c-red"><div class="stat-label">إنفاق إعلاني</div><div class="stat-value" id="ai-spend">—</div><div class="stat-sub">$</div></div>
@@ -197,6 +199,8 @@ window.onload=()=>{
   document.getElementById('fromDate').value=fmt(week);
   document.getElementById('fbTo').value=fmt(today);
   document.getElementById('fbFrom').value=fmt(week);
+  document.getElementById('aiFrom').value=fmt(week);
+  document.getElementById('aiTo').value=fmt(today);
   loadAll(); setupDrop();
 };
 
@@ -292,7 +296,10 @@ function renderCampaigns(camps){
 
 async function runAI(){
   const days=parseInt(document.getElementById('aiPeriod').value);
-  const from=fmt(new Date(Date.now()-days*86400000)),to=fmt(new Date());
+  const aiFrom=document.getElementById('aiFrom').value;
+  const aiTo=document.getElementById('aiTo').value;
+  const from=aiFrom||fmt(new Date(Date.now()-days*86400000));
+  const to=aiTo||fmt(new Date());
   document.getElementById('aiEmpty').style.display='none';
   document.getElementById('aiBox').style.display='none';
   document.getElementById('aiStats').style.display='none';
