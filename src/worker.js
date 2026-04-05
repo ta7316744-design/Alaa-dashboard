@@ -134,7 +134,7 @@ if (updated >= from_date && updated <= to_date) {
         });
         const data = await r.json();
         if (data.choices) analysis = data.choices[0].message.content;
-        else if (data.error) error_msg = String(data.error);
+        else if (data.error) error_msg = JSON.stringify(data.error);
       } catch(e) { error_msg = e.message; }
 
       return new Response(JSON.stringify({ analysis, error: error_msg, stats: { total_spend, total_orders, total_revenue, delivered, cancelled, delivery_rate, global_cpo, global_roas, profit } }), {
