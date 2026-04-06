@@ -314,7 +314,7 @@ async function runAI(){
   if(!orders.length){try{const r=await fetch(`${API_ORDERS}?from=${from}&to=${to}`);const d=await r.json();orders=d.orders||[];}catch(e){}}
   if(!camps.length){try{const r=await fetch(`${API_FB}?from=${from}&to=${to}`);const d=await r.json();camps=d.campaigns||[];}catch(e){}}
   try{
-    const res=await fetch(API_AI,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({campaigns:camps,orders:orders,period:`آخر ${days} أيام`})});
+    const res=await fetch(API_AI,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({campaigns:camps,orders:orders,period:`آخر ${days} أيام`,question:document.getElementById('aiQuestion').value})});
     const data=await res.json();
     document.getElementById('aiLoading').style.display='none';
     document.getElementById('aiBtn').disabled=false;
