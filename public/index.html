@@ -419,7 +419,7 @@ function deleteSheet(){
   document.getElementById('reconResults').style.display='none';
 }
 
-function analyzeRecon(){
+async function analyzeRecon(){
   if(!allOrders.length){
   try{const r=await fetch(`${API_ORDERS}`);const d=await r.json();allOrders=d.orders||[];}catch(e){}
 }
