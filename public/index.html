@@ -227,6 +227,19 @@ window.onload=()=>{
   document.getElementById('aiFrom').value=fmt(week);
   document.getElementById('aiTo').value=fmt(today);
   loadAll(); setupDrop();
+  const saved=localStorage.getItem('savedSheet');
+const savedName=localStorage.getItem('savedSheetName');
+if(saved){
+  const json=JSON.parse(saved);
+  savedSheetData=json;savedSheetName=savedName||'fiche.xlsx';
+  sheetHeaders=json[0]||[];sheetData=json.slice(1).filter(r=>r.some(c=>c));
+  ['colId','colStatus','colAmount','colName'].forEach(id=>{const sel=document.getElementById(id);const prev=id==='colAmount'||id==='colName'?'<option value="">— لا يوجد —</option>':'';sel.innerHTML=prev+sheetHeaders.map((h,i)=>`<option value="${i}">${h}</option>`).join('');});
+  sheetHeaders.forEach((h,i)=>{const hl=(h||'').toLowerCase();if(hl.includes('id')||hl.includes('رقم')||hl.includes('track'))document.getElementById('colId').value=i;if(hl.includes('status')||hl.includes('حالة'))document.getElementById('colStatus').value=i;if(hl.includes('amount')||hl.includes('مبلغ')||hl.includes('total'))document.getElementById('colAmount').value=i;if(hl.includes('name')||hl.includes('اسم'))document.getElementById('colName').value=i;});
+  document.getElementById('dropZone').style.display='none';
+  document.getElementById('reconFileInfo').style.display='block';
+  document.getElementById('reconFileName').textContent=savedName||'fiche.xlsx';
+  document.getElementById('reconFileRows').textContent=sheetData.length+' صف';
+  document.getElementById('colMap').style.display='block';
 };
 function toggleAiDates(){
   const custom=document.getElementById('aiPeriod').value==='custom';
@@ -371,6 +384,8 @@ function handleFile(e){
     const wb=XLSX.read(ev.target.result,{type:'binary'});const ws=wb.Sheets[wb.SheetNames[0]];const json=XLSX.utils.sheet_to_json(ws,{header:1});
     sheetHeaders=json[0]||[];sheetData=json.slice(1).filter(r=>r.some(c=>c));
     savedSheetData=json;
+    localStorage.setItem('savedSheet', JSON.stringify(json));
+localStorage.setItem('savedSheetName', file.name);
     ['colId','colStatus','colAmount','colName'].forEach(id=>{const sel=document.getElementById(id);const prev=id==='colAmount'||id==='colName'?'<option value="">— لا يوجد —</option>':'';sel.innerHTML=prev+sheetHeaders.map((h,i)=>`<option value="${i}">${h}</option>`).join('');});
     sheetHeaders.forEach((h,i)=>{const hl=(h||'').toLowerCase();if(hl.includes('id')||hl.includes('رقم')||hl.includes('track'))document.getElementById('colId').value=i;if(hl.includes('status')||hl.includes('حالة'))document.getElementById('colStatus').value=i;if(hl.includes('amount')||hl.includes('مبلغ')||hl.includes('total'))document.getElementById('colAmount').value=i;if(hl.includes('name')||hl.includes('اسم'))document.getElementById('colName').value=i;});
     document.getElementById('dropZone').style.display='none';
