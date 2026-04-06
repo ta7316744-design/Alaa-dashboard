@@ -412,6 +412,8 @@ function exportSheet(){
 function deleteSheet(){
   if(!confirm('هل تريد حذف الفيشي؟'))return;
   sheetData=[];sheetHeaders=[];savedSheetData=[];savedSheetName='';
+  localStorage.removeItem('savedSheet');
+  localStorage.removeItem('savedSheetName');
   document.getElementById('dropZone').style.display='block';
   document.getElementById('reconFileInfo').style.display='none';
   document.getElementById('colMap').style.display='none';
