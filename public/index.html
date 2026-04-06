@@ -434,7 +434,11 @@ function analyzeRecon(){
     if(!ws.includes(ww)&&!ww.includes(ws))reconData.diffStatus.push({id:sr.id,sheetStatus:sr.status,watiStatus:wr.status,customer:wr.customer});
     delete watiMap[sr.id];
   });
-  Object.values(watiMap).forEach(o=>reconData.notInWati.push(o));
+  Object.values(watiMap).forEach(o=>{
+  const s=(o.status||'').toLowerCase();
+  if(s.includes('deliver')||s.includes('تسليم')||s.includes('مسلم'))
+    reconData.notInWati.push(o);
+});
   document.getElementById('countTaken').textContent=reconData.matched.length;
   document.getElementById('countRemaining').textContent=reconData.notInWati.length;
   document.getElementById('reconStats').innerHTML=`
