@@ -124,8 +124,9 @@ if (updated >= from_date && updated <= to_date) {
       const profit = total_revenue - total_spend;
       const camp_summary = campaigns.sort((a,b)=>b.spend-a.spend).slice(0,10).map(c=>`- ${c.name}: $${c.spend.toFixed(2)}, طلبات=${c.purchases}, CPO=$${c.cpo.toFixed(2)}, ROAS=${c.roas.toFixed(2)}`).join('\n');
       const question = body.question || '';
-      const prompt = `أنت خبير تسويق رقمي. حلل البيانات وقدم توصيات باللغة العربية.\nالفترة: ${period}\nالإنفاق: $${total_spend.toFixed(2)} | الطلبات: ${total_orders} | المبيعات: ${total_revenue.toFixed(2)} دج\nالموصل: ${delivered} (${delivery_rate}%) | الملغي: ${cancelled}\nCPO: $${global_cpo.toFixed(2)} | ROAS: ${global_roas.toFixed(2)} | الربح: ${profit.toFixed(2)} دج\nالحملات:\n${camp_summary||'لا توجد بيانات'}\nاعطني:\n1. تقييم الأداء العام\n2. أفضل حملة وأسوأ حملة\n3. 3 توصيات عملية\n4. 4. تحذير إن وجد${question ? '\n5. أجب على هذا السؤال: ' + question : ''}`;
-
+const prompt = question
+  ? `أنت خبير تسويق رقمي. عندك هذه البيانات:\nالفترة: ${period}\nالإنفاق: $${total_spend.toFixed(2)} | الطلبات: ${total_orders} | المبيعات: ${total_revenue.toFixed(2)} دج\nالموصل: ${delivered} (${delivery_rate}%) | الملغي: ${cancelled}\nCPO: $${global_cpo.toFixed(2)} | ROAS: ${global_roas.toFixed(2)} | الربح: ${profit.toFixed(2)} دج\nالحملات:\n${camp_summary||'لا توجد بيانات'}\nأجب على هذا السؤال فقط باللغة العربية: ${question}`
+  : `أنت خبير تسويق رقمي. حلل البيانات وقدم توصيات باللغة العربية.\nالفترة: ${period}\nالإنفاق: $${total_spend.toFixed(2)} | الطلبات: ${total_orders} | المبيعات: ${total_revenue.toFixed(2)} دج\nالموصل: ${delivered} (${delivery_rate}%) | الملغي: ${cancelled}\nCPO: $${global_cpo.toFixed(2)} | ROAS: ${global_roas.toFixed(2)} | الربح: ${profit.toFixed(2)} دج\nالحملات:\n${camp_summary||'لا توجد بيانات'}\nاعطني:\n1. تقييم الأداء العام\n2. أفضل حملة وأسوأ حملة\n3. 3 توصيات عملية\n4. تحذير إن وجد`;
       let analysis = '', error_msg = '';
       try {
         const r = await fetch('https://api.deepseek.com/chat/completions', {
