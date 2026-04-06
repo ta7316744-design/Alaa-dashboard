@@ -240,7 +240,9 @@ if(saved){
   document.getElementById('reconFileName').textContent=savedName||'fiche.xlsx';
   document.getElementById('reconFileRows').textContent=sheetData.length+' صف';
   document.getElementById('colMap').style.display='block';
+}
 };
+function toggleAiDates(){
 function toggleAiDates(){
   const custom=document.getElementById('aiPeriod').value==='custom';
   document.getElementById('aiFromGroup').style.display=custom?'flex':'none';
