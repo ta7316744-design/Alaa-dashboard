@@ -359,40 +359,135 @@ async function runAI(){
 
 function setupDrop(){const zone=document.getElementById('dropZone');zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag');});zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag');handleFile({target:{files:e.dataTransfer.files}});});}
 
+let reconData={matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
+let currentReconFilter='all';
+let savedSheetData=[];
+let savedSheetName='';
+
 function handleFile(e){
   const file=e.target.files[0];if(!file)return;
+  savedSheetName=file.name;
   const reader=new FileReader();
   reader.onload=ev=>{
     const wb=XLSX.read(ev.target.result,{type:'binary'});const ws=wb.Sheets[wb.SheetNames[0]];const json=XLSX.utils.sheet_to_json(ws,{header:1});
     sheetHeaders=json[0]||[];sheetData=json.slice(1).filter(r=>r.some(c=>c));
+    savedSheetData=json;
     ['colId','colStatus','colAmount','colName'].forEach(id=>{const sel=document.getElementById(id);const prev=id==='colAmount'||id==='colName'?'<option value="">— لا يوجد —</option>':'';sel.innerHTML=prev+sheetHeaders.map((h,i)=>`<option value="${i}">${h}</option>`).join('');});
     sheetHeaders.forEach((h,i)=>{const hl=(h||'').toLowerCase();if(hl.includes('id')||hl.includes('رقم')||hl.includes('track'))document.getElementById('colId').value=i;if(hl.includes('status')||hl.includes('حالة'))document.getElementById('colStatus').value=i;if(hl.includes('amount')||hl.includes('مبلغ')||hl.includes('total'))document.getElementById('colAmount').value=i;if(hl.includes('name')||hl.includes('اسم'))document.getElementById('colName').value=i;});
-    document.getElementById('dropZone').innerHTML=`<div class="upload-icon">✅</div><div class="upload-title">${file.name}</div><div class="upload-sub">${sheetData.length} صف</div><button class="btn-upload" onclick="document.getElementById('fileInput').click()">تغيير</button><input type="file" id="fileInput" accept=".xlsx,.xls,.csv" onchange="handleFile(event)" style="display:none"/>`;
-    document.getElementById('colMap').style.display='block';document.getElementById('reconResults').style.display='none';
+    document.getElementById('dropZone').style.display='none';
+    const fi=document.getElementById('reconFileInfo');
+    fi.style.display='block';
+    document.getElementById('reconFileName').textContent=file.name;
+    document.getElementById('reconFileRows').textContent=sheetData.length+' صف';
+    document.getElementById('colMap').style.display='block';
+    document.getElementById('reconResults').style.display='none';
   };
   reader.readAsBinaryString(file);
 }
 
+function exportSheet(){
+  if(!savedSheetData.length)return;
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(savedSheetData);
+  XLSX.utils.book_append_sheet(wb,ws,'Sheet1');
+  XLSX.writeFile(wb,savedSheetName||'fiche.xlsx');
+}
+
+function deleteSheet(){
+  if(!confirm('هل تريد حذف الفيشي؟'))return;
+  sheetData=[];sheetHeaders=[];savedSheetData=[];savedSheetName='';
+  document.getElementById('dropZone').style.display='block';
+  document.getElementById('reconFileInfo').style.display='none';
+  document.getElementById('colMap').style.display='none';
+  document.getElementById('reconResults').style.display='none';
+}
+
 function analyzeRecon(){
-  if(!allOrders.length){alert('حمّل الطلبات أولاً');return;}if(!sheetData.length){alert('ارفع الفيشي شيت أولاً');return;}
+  if(!allOrders.length){alert('حمّل الطلبات أولاً');return;}
+  if(!sheetData.length){alert('ارفع الفيشي شيت أولاً');return;}
   const iId=parseInt(document.getElementById('colId').value),iSt=parseInt(document.getElementById('colStatus').value),iAm=document.getElementById('colAmount').value,iNm=document.getElementById('colName').value;
   const watiMap={};allOrders.forEach(o=>{watiMap[String(o.id||'').trim()]=o;});
   const sheetRows=sheetData.map(r=>({id:String(r[iId]||'').trim(),status:String(r[iSt]||'').trim(),amount:iAm!==''?parseFloat(r[iAm])||0:null,name:iNm!==''?String(r[iNm]||''):null})).filter(r=>r.id);
-  let matched=0,notInSheet=[],notInWati=[],diffStatus=[];
-  sheetRows.forEach(sr=>{const wr=watiMap[sr.id];if(!wr){notInSheet.push(sr);return;}matched++;const ws=(sr.status||'').toLowerCase(),ww=(wr.status||'').toLowerCase();if(!ws.includes(ww)&&!ww.includes(ws))diffStatus.push({id:sr.id,sheetStatus:sr.status,watiStatus:wr.status,customer:wr.customer});delete watiMap[sr.id];});
-  Object.values(watiMap).forEach(o=>notInWati.push(o));
-  document.getElementById('reconStats').innerHTML=`<div class="stat-card c-green"><div class="stat-label">متطابق</div><div class="stat-value">${matched}</div></div><div class="stat-card c-red"><div class="stat-label">في الفيشي فقط</div><div class="stat-value">${notInSheet.length}</div></div><div class="stat-card c-yellow"><div class="stat-label">في WATI فقط</div><div class="stat-value">${notInWati.length}</div></div><div class="stat-card c-purple"><div class="stat-label">حالة مختلفة</div><div class="stat-value">${diffStatus.length}</div></div>`;
-  let rows='';
-  diffStatus.forEach(r=>{rows+=`<tr><td style="color:var(--accent)">${esc(r.id)}</td><td>${esc(r.customer)}</td><td><span class="badge b-blue">${esc(r.sheetStatus)}</span></td><td><span class="badge b-yellow">${esc(r.watiStatus)}</span></td><td><span class="badge b-red">تعارض</span></td></tr>`;});
-  notInSheet.forEach(r=>{rows+=`<tr><td style="color:var(--accent)">${esc(r.id)}</td><td>${esc(r.name||'—')}</td><td colspan="2" style="color:var(--text3)">في الفيشي فقط</td><td><span class="badge b-red">غير موجود</span></td></tr>`;});
-  notInWati.forEach(o=>{rows+=`<tr><td style="color:var(--accent)">${esc(o.id)}</td><td>${esc(o.customer)}</td><td colspan="2" style="color:var(--text3)">في WATI فقط</td><td><span class="badge b-yellow">غير موجود</span></td></tr>`;});
-  document.getElementById('reconCount').textContent=(diffStatus.length+notInSheet.length+notInWati.length)+' مشكلة';
-  document.getElementById('reconTable').innerHTML=rows?`<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>رقم الطلب</th><th>الاسم</th><th>حالة الفيشي</th><th>حالة WATI</th><th>الملاحظة</th></tr></thead><tbody>${rows}</tbody></table></div>`:'<div class="empty"><div class="empty-icon">🎉</div><div>كل شيء متطابق!</div></div>';
+  reconData={matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
+  sheetRows.forEach(sr=>{
+    const wr=watiMap[sr.id];
+    if(!wr){reconData.notInSheet.push(sr);return;}
+    reconData.matched.push({id:sr.id,customer:wr.customer,sheetStatus:sr.status,watiStatus:wr.status});
+    const ws=(sr.status||'').toLowerCase(),ww=(wr.status||'').toLowerCase();
+    if(!ws.includes(ww)&&!ww.includes(ws))reconData.diffStatus.push({id:sr.id,sheetStatus:sr.status,watiStatus:wr.status,customer:wr.customer});
+    delete watiMap[sr.id];
+  });
+  Object.values(watiMap).forEach(o=>reconData.notInWati.push(o));
+  document.getElementById('countTaken').textContent=reconData.matched.length;
+  document.getElementById('countRemaining').textContent=reconData.notInWati.length;
+  document.getElementById('reconStats').innerHTML=`
+    <div class="stat-card c-green"><div class="stat-label">مأخوذة</div><div class="stat-value">${reconData.matched.length}</div></div>
+    <div class="stat-card c-yellow"><div class="stat-label">متبقية</div><div class="stat-value">${reconData.notInWati.length}</div></div>
+    <div class="stat-card c-red"><div class="stat-label">في الفيشي فقط</div><div class="stat-value">${reconData.notInSheet.length}</div></div>
+    <div class="stat-card c-purple"><div class="stat-label">حالة مختلفة</div><div class="stat-value">${reconData.diffStatus.length}</div></div>`;
+  currentReconFilter='all';
+  renderReconTable();
   document.getElementById('reconResults').style.display='block';
   document.getElementById('reconResults').scrollIntoView({behavior:'smooth'});
 }
 
+function filterRecon(type){
+  currentReconFilter=type;
+  document.getElementById('reconSearch').value='';
+  renderReconTable();
+}
+
+function searchRecon(){
+  const q=document.getElementById('reconSearch').value.trim().toLowerCase();
+  if(!q){renderReconTable();return;}
+  const all=[
+    ...reconData.matched.map(r=>({...r,_type:'taken'})),
+    ...reconData.notInWati.map(o=>({id:o.id,customer:o.customer,watiStatus:o.status,sheetStatus:'—',_type:'remaining'})),
+    ...reconData.notInSheet.map(r=>({...r,customer:r.name||'—',watiStatus:'—',_type:'sheet_only'})),
+    ...reconData.diffStatus.map(r=>({...r,_type:'diff'}))
+  ];
+  const found=all.filter(r=>r.id.toLowerCase().includes(q));
+  renderRows(found);
+}
+
+function renderReconTable(){
+  let rows=[];
+  if(currentReconFilter==='taken'){
+    rows=reconData.matched.map(r=>({id:r.id,customer:r.customer,sheetStatus:r.sheetStatus,watiStatus:r.watiStatus,_type:'taken'}));
+  } else if(currentReconFilter==='remaining'){
+    rows=reconData.notInWati.map(o=>({id:o.id,customer:o.customer,sheetStatus:'—',watiStatus:o.status,_type:'remaining'}));
+  } else {
+    rows=[
+      ...reconData.diffStatus.map(r=>({...r,_type:'diff'})),
+      ...reconData.notInSheet.map(r=>({id:r.id,customer:r.name||'—',sheetStatus:r.status,watiStatus:'—',_type:'sheet_only'})),
+      ...reconData.notInWati.map(o=>({id:o.id,customer:o.customer,sheetStatus:'—',watiStatus:o.status,_type:'remaining'})),
+    ];
+  }
+  document.getElementById('reconCount').textContent=rows.length+' طلب';
+  renderRows(rows);
+}
+
+function renderRows(rows){
+  if(!rows.length){document.getElementById('reconTable').innerHTML='<div class="empty"><div class="empty-icon">🎉</div><div>لا توجد نتائج</div></div>';return;}
+  const html=rows.map(r=>{
+    let badge='',note='';
+    if(r._type==='taken'){badge=`<span class="badge b-green">مأخوذة</span>`;note=r.sheetStatus;}
+    else if(r._type==='remaining'){badge=`<span class="badge b-yellow">متبقية</span>`;note=r.watiStatus;}
+    else if(r._type==='sheet_only'){badge=`<span class="badge b-red">في الفيشي فقط</span>`;note='—';}
+    else if(r._type==='diff'){badge=`<span class="badge b-red">تعارض</span>`;note=`${r.sheetStatus} ← ${r.watiStatus}`;}
+    return `<tr><td style="font-weight:700;color:var(--accent)">${esc(r.id)}</td><td>${esc(r.customer||'—')}</td><td>${note}</td><td>${badge}</td></tr>`;
+  }).join('');
+  document.getElementById('reconTable').innerHTML=`<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>رقم الطلب</th><th>الاسم</th><th>الحالة</th><th>الملاحظة</th></tr></thead><tbody>${html}</tbody></table></div>`;
+}
+
+function exportReconCSV(){
+  const rows=[];
+  [...reconData.matched.map(r=>({...r,type:'مأخوذة'})),
+   ...reconData.notInWati.map(o=>({id:o.id,customer:o.customer,watiStatus:o.status,sheetStatus:'—',type:'متبقية'})),
+   ...reconData.notInSheet.map(r=>({id:r.id,customer:r.name||'—',sheetStatus:r.status,watiStatus:'—',type:'في الفيشي فقط'}))
+  ].forEach(r=>rows.push([r.id,r.customer||'—',r.sheetStatus||'—',r.watiStatus||'—',r.type]));
+  const csv='\uFEFF'+'رقم الطلب,الاسم,حالة الفيشي,حالة WATI,الملاحظة\n'+rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`recon-${fmt(new Date())}.csv`;a.click();
+}
+
 function esc(s){return String(s||'—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-</script>
-</body>
-</html>
