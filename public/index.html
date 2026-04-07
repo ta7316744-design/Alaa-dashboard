@@ -440,6 +440,7 @@ for(const row of sheetData){
 const oldData=savedReconOld?JSON.parse(savedReconOld):{matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
 const oldMatchedIds=new Set((oldData.matched||[]).map(r=>r.id));
 reconData={matched:[...oldData.matched||[]],notInSheet:[],notInWati:[],diffStatus:[]};
+  (oldData.matched||[]).forEach(r=>{delete watiMap[r.id];});
   sheetRows.forEach(sr=>{
   const wr=watiMap[sr.id];
   if(!wr){reconData.notInSheet.push(sr);return;}
