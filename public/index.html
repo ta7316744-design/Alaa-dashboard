@@ -210,19 +210,6 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;h
 <script>
 const API_ORDERS='/api/orders', API_FB='/api/facebook', API_AI='/api/ai_analysis';
 let allOrders=[],filteredOrders=[],allCampaigns=[],sheetData=[],sheetHeaders=[];
-const savedReconResults=localStorage.getItem('reconData');
-if(savedReconResults){
-  reconData=JSON.parse(savedReconResults);
-  document.getElementById('countTaken').textContent=reconData.matched.length;
-  document.getElementById('countRemaining').textContent=reconData.notInWati.length;
-  document.getElementById('reconStats').innerHTML=`
-    <div class="stat-card c-green"><div class="stat-label">مأخوذة</div><div class="stat-value">${reconData.matched.length}</div></div>
-    <div class="stat-card c-yellow"><div class="stat-label">متبقية</div><div class="stat-value">${reconData.notInWati.length}</div></div>
-    <div class="stat-card c-red"><div class="stat-label">في الفيشي فقط</div><div class="stat-value">${reconData.notInSheet.length}</div></div>
-    <div class="stat-card c-purple"><div class="stat-label">حالة مختلفة</div><div class="stat-value">${reconData.diffStatus.length}</div></div>`;
-  renderReconTable();
-  document.getElementById('reconResults').style.display='block';
-}
 window.onload=()=>{
   const today=new Date(),week=new Date(today-7*86400000);
   document.getElementById('toDate').value=fmt(today);
