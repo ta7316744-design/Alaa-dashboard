@@ -450,9 +450,10 @@ reconData={matched:[...oldData.matched||[]],notInSheet:[],notInWati:[],diffStatu
   }
   delete watiMap[sr.id];
 });
-  Object.values(watiMap).forEach(o=>{
+ const allMatchedIds=new Set(reconData.matched.map(r=>r.id));
+allOrders.forEach(o=>{
   const s=(o.status||'').toLowerCase();
-  if(s.includes('deliver')||s.includes('تسليم')||s.includes('مسلم'))
+  if((s.includes('deliver')||s.includes('تسليم')||s.includes('مسلم'))&&!allMatchedIds.has(String(o.id||'').trim()))
     reconData.notInWati.push(o);
 });
   document.getElementById('countTaken').textContent=reconData.matched.length;
