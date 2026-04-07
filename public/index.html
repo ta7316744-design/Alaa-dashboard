@@ -230,6 +230,7 @@ if(savedRecon){
     <div class="stat-card c-yellow"><div class="stat-label">متبقية</div><div class="stat-value">${reconData.notInWati.length}</div></div>
     <div class="stat-card c-red"><div class="stat-label">في الفيشي فقط</div><div class="stat-value">${reconData.notInSheet.length}</div></div>
     <div class="stat-card c-orange"><div class="stat-label">راجع بعد توصيل</div><div class="stat-value">${reconData.diffStatus.length}</div></div>
+    `);
   setTimeout(renderReconTable, 100);
   document.getElementById('reconResults').style.display='block';
 }
