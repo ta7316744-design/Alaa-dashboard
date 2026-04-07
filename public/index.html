@@ -440,7 +440,9 @@ for(const row of sheetData){
     }
   }
 }
-  reconData={matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
+  const savedReconOld=localStorage.getItem('reconData');
+const oldData=savedReconOld?JSON.parse(savedReconOld):{matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
+reconData={matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
   sheetRows.forEach(sr=>{
     const wr=watiMap[sr.id];
     if(!wr){reconData.notInSheet.push(sr);return;}
