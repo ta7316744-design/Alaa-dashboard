@@ -229,7 +229,7 @@ if(savedRecon){
     <div class="stat-card c-green"><div class="stat-label">مأخوذة</div><div class="stat-value">${reconData.matched.length}</div></div>
     <div class="stat-card c-yellow"><div class="stat-label">متبقية</div><div class="stat-value">${reconData.notInWati.length}</div></div>
     <div class="stat-card c-red"><div class="stat-label">في الفيشي فقط</div><div class="stat-value">${reconData.notInSheet.length}</div></div>
-    <div class="stat-card c-purple"><div class="stat-label">حالة مختلفة</div><div class="stat-value">${reconData.diffStatus.length}</div></div>`;
+    <div class="stat-card c-orange"><div class="stat-label">راجع بعد توصيل</div><div class="stat-value">${reconData.diffStatus.length}</div></div>
   setTimeout(renderReconTable, 100);
   document.getElementById('reconResults').style.display='block';
 }
@@ -519,7 +519,7 @@ function renderRows(rows){
     if(r._type==='taken'){badge=`<span class="badge b-green">مأخوذة</span>`;note=r.sheetStatus;}
     else if(r._type==='remaining'){badge=`<span class="badge b-yellow">متبقية</span>`;note=r.watiStatus;}
     else if(r._type==='sheet_only'){badge=`<span class="badge b-red">في الفيشي فقط</span>`;note='—';}
-    else if(r._type==='diff'){badge=`<span class="badge b-red">تعارض</span>`;note=`${r.sheetStatus} ← ${r.watiStatus}`;}
+    else if(r._type==='diff'){badge=`<span class="badge b-orange" style="background:rgba(249,115,22,.15);color:var(--orange)">راجع بعد توصيل</span>`;note=r.watiStatus;}
     return `<tr><td style="font-weight:700;color:var(--accent)">${esc(r.id)}</td><td>${esc(r.customer||'—')}</td><td>${note}</td><td>${badge}</td></tr>`;
   }).join('');
   document.getElementById('reconTable').innerHTML=`<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>رقم الطلب</th><th>الاسم</th><th>الحالة</th><th>الملاحظة</th></tr></thead><tbody>${html}</tbody></table></div>`;
