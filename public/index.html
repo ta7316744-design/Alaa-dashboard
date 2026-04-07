@@ -197,6 +197,7 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;h
       <button class="btn btn-gray" onclick="filterRecon('remaining')" id="btnRemaining">⏳ متبقية (<span id="countRemaining">0</span>)</button>
       <button class="btn btn-gray" onclick="filterRecon('all')" id="btnAll">📋 الكل</button>
       <button class="btn btn-green" onclick="exportReconCSV()">⬇ تصدير CSV</button>
+      <button class="btn btn-gray" onclick="resetRecon()" style="background:var(--red);color:#fff">🗑 إعادة تعيين</button>
     </div>
     <div class="stats-grid" id="reconStats"></div>
     <div class="table-wrap">
@@ -525,7 +526,14 @@ function exportReconCSV(){
   const csv='\uFEFF'+'رقم الطلب,الاسم,حالة الفيشي,حالة WATI,الملاحظة\n'+rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
   const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`recon-${fmt(new Date())}.csv`;a.click();
 }
-
+function resetRecon(){
+  if(!confirm('هل تريد مسح كل النتائج والبدء من الصفر؟'))return;
+  reconData={matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
+  localStorage.removeItem('reconData');
+  document.getElementById('reconResults').style.display='none';
+  document.getElementById('countTaken').textContent='0';
+  document.getElementById('countRemaining').textContent='0';
+}
 function esc(s){return String(s||'—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   </script>
 </body>
