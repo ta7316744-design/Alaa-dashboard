@@ -409,7 +409,6 @@ localStorage.setItem('savedSheetName', file.name);
     document.getElementById('reconFileName').textContent=file.name;
     document.getElementById('reconFileRows').textContent=sheetData.length+' صف';
     document.getElementById('colMap').style.display='block';
-    document.getElementById('reconResults').style.display='none';
   };
   reader.readAsBinaryString(file);
 }
