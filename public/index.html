@@ -419,6 +419,8 @@ function deleteSheet(){
   document.getElementById('reconFileInfo').style.display='none';
   document.getElementById('colMap').style.display='none';
   document.getElementById('reconResults').style.display='none';
+  localStorage.removeItem('reconData');
+reconData={matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
 }
 
 async function analyzeRecon(){
