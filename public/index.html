@@ -220,6 +220,19 @@ window.onload=()=>{
   document.getElementById('aiFrom').value=fmt(week);
   document.getElementById('aiTo').value=fmt(today);
   loadAll(); setupDrop();
+  const savedRecon=localStorage.getItem('reconData');
+if(savedRecon){
+  reconData=JSON.parse(savedRecon);
+  document.getElementById('countTaken').textContent=reconData.matched.length;
+  document.getElementById('countRemaining').textContent=reconData.notInWati.length;
+  document.getElementById('reconStats').innerHTML=`
+    <div class="stat-card c-green"><div class="stat-label">مأخوذة</div><div class="stat-value">${reconData.matched.length}</div></div>
+    <div class="stat-card c-yellow"><div class="stat-label">متبقية</div><div class="stat-value">${reconData.notInWati.length}</div></div>
+    <div class="stat-card c-red"><div class="stat-label">في الفيشي فقط</div><div class="stat-value">${reconData.notInSheet.length}</div></div>
+    <div class="stat-card c-purple"><div class="stat-label">حالة مختلفة</div><div class="stat-value">${reconData.diffStatus.length}</div></div>`;
+  renderReconTable();
+  document.getElementById('reconResults').style.display='block';
+}
   const saved=localStorage.getItem('savedSheet');
 const savedName=localStorage.getItem('savedSheetName');
 if(saved){
@@ -448,6 +461,7 @@ for(const row of sheetData){
     <div class="stat-card c-purple"><div class="stat-label">حالة مختلفة</div><div class="stat-value">${reconData.diffStatus.length}</div></div>`;
   currentReconFilter='all';
   renderReconTable();
+  localStorage.setItem('reconData', JSON.stringify(reconData));
   document.getElementById('reconResults').style.display='block';
   document.getElementById('reconResults').scrollIntoView({behavior:'smooth'});
 }
