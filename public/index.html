@@ -437,15 +437,17 @@ for(const row of sheetData){
 }
   const savedReconOld=localStorage.getItem('reconData');
 const oldData=savedReconOld?JSON.parse(savedReconOld):{matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
-reconData={matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
+const oldMatchedIds=new Set((oldData.matched||[]).map(r=>r.id));
+reconData={matched:[...oldData.matched||[]],notInSheet:[],notInWati:[],diffStatus:[]};
   sheetRows.forEach(sr=>{
-    const wr=watiMap[sr.id];
-    if(!wr){reconData.notInSheet.push(sr);return;}
+  const wr=watiMap[sr.id];
+  if(!wr){reconData.notInSheet.push(sr);return;}
+  if(!oldMatchedIds.has(sr.id)){
     reconData.matched.push({id:sr.id,customer:wr.customer,sheetStatus:sr.status,watiStatus:wr.status});
-    const ws=(sr.status||'').toLowerCase(),ww=(wr.status||'').toLowerCase();
-    if(!ws.includes(ww)&&!ww.includes(ws))reconData.diffStatus.push({id:sr.id,sheetStatus:sr.status,watiStatus:wr.status,customer:wr.customer});
-    delete watiMap[sr.id];
-  });
+    oldMatchedIds.add(sr.id);
+  }
+  delete watiMap[sr.id];
+});
   Object.values(watiMap).forEach(o=>{
   const s=(o.status||'').toLowerCase();
   if(s.includes('deliver')||s.includes('تسليم')||s.includes('مسلم'))
