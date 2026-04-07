@@ -184,14 +184,9 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;h
       </div>
     </div>
   </div>
-  <div class="col-map" id="colMap" style="display:none">
-    <h3>🗂 حدد الأعمدة</h3>
-    <div class="col-map-grid">
-      <div class="col-map-item"><label>رقم الطلب</label><select id="colId"></select></div>
-      <div class="col-map-item"><label>الحالة</label><select id="colStatus"></select></div>
-      <div class="col-map-item"><label>المبلغ (اختياري)</label><select id="colAmount"><option value="">— لا يوجد —</option></select></div>
-      <div class="col-map-item"><label>الاسم (اختياري)</label><select id="colName"><option value="">— لا يوجد —</option></select></div>
-    </div>
+ <div class="col-map" id="colMap" style="display:none">
+  <button class="btn-analyze" onclick="analyzeRecon()">📊 تحليل وقارن</button>
+</div>
     <button class="btn-analyze" onclick="analyzeRecon()">📊 تحليل وقارن</button>
   </div>
   <div id="reconResults" style="display:none">
