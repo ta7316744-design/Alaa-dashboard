@@ -426,8 +426,6 @@ async function analyzeRecon(){
 if(!allOrders.length){alert('حمّل الطلبات أولاً');return;}
   if(!sheetData.length){alert('ارفع الفيشي شيت أولاً');return;}
   const watiMap={};allOrders.forEach(o=>{watiMap[String(o.id||'').trim()]=o;});
-  // احذف المأخوذة القديمة من الـ watiMap
-(oldData.matched||[]).forEach(r=>{delete watiMap[r.id];});
 const sheetRows=[];
 for(const row of sheetData){
   for(const cell of row){
