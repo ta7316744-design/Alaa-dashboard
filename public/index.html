@@ -421,54 +421,61 @@ function deleteSheet(){
 
 async function analyzeRecon(){
   if(!allOrders.length){
-  try{const r=await fetch(`${API_ORDERS}?all=1`);const d=await r.json();allOrders=d.orders||[];}catch(e){}
-}
-if(!allOrders.length){alert('حمّل الطلبات أولاً');return;}
+    try{const r=await fetch(`${API_ORDERS}?all=1`);const d=await r.json();allOrders=d.orders||[];}catch(e){}
+  }
+  if(!allOrders.length){alert('حمّل الطلبات أولاً');return;}
   if(!sheetData.length){alert('ارفع الفيشي شيت أولاً');return;}
-  const watiMap={};allOrders.forEach(o=>{watiMap[String(o.id||'').trim()]=o;});
-const sheetRows=[];
-for(const row of sheetData){
-  for(const cell of row){
-    const val=String(cell||'').trim();
-    if(/^ORD-\d+$/i.test(val)){
-      sheetRows.push({id:val,status:'—',amount:null,name:null});
-      break;
+
+  const deliveredMap={};
+  allOrders.forEach(o=>{
+    const s=(o.status||'').toLowerCase();
+    if(s.includes('deliver')||s.includes('تسليم')||s.includes('مسلم')){
+      deliveredMap[String(o.id||'').trim()]=o;
+    }
+  });
+
+  const sheetIds=new Set();
+  for(const row of sheetData){
+    for(const cell of row){
+      const val=String(cell||'').trim();
+      if(/^ORD-\d+$/i.test(val)){
+        sheetIds.add(val.toUpperCase());
+        break;
+      }
     }
   }
-}
-  const savedReconOld=localStorage.getItem('reconData');
-const oldData=savedReconOld?JSON.parse(savedReconOld):{matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
-const oldMatchedIds=new Set((oldData.matched||[]).map(r=>r.id));
-reconData={matched:[...oldData.matched||[]],notInSheet:[],notInWati:[],diffStatus:[]};
-  (oldData.matched||[]).forEach(r=>{delete watiMap[r.id];});
-  sheetRows.forEach(sr=>{
-  const wr=watiMap[sr.id];
-  if(!wr){reconData.notInSheet.push(sr);return;}
-  if(!oldMatchedIds.has(sr.id)){
-    reconData.matched.push({id:sr.id,customer:wr.customer,sheetStatus:sr.status,watiStatus:wr.status});
-    oldMatchedIds.add(sr.id);
-  }
-  delete watiMap[sr.id];
-});
- Object.values(watiMap).forEach(o=>{
-  const s=(o.status||'').toLowerCase();
-  if(s.includes('deliver')||s.includes('تسليم')||s.includes('مسلم'))
-    reconData.notInWati.push(o);
-});
-  document.getElementById('countTaken').textContent=reconData.matched.length;
-  document.getElementById('countRemaining').textContent=reconData.notInWati.length;
+
+  const matched=[];
+  const notInWati=[];
+  const notInSheet=[];
+
+  Object.entries(deliveredMap).forEach(([id,o])=>{
+    if(sheetIds.has(id)){
+      matched.push({id,customer:o.customer,watiStatus:o.status,sheetStatus:'—'});
+    } else {
+      notInWati.push(o);
+    }
+  });
+
+  sheetIds.forEach(id=>{
+    if(!deliveredMap[id]) notInSheet.push({id,name:'—',status:'—'});
+  });
+
+  reconData={matched,notInSheet,notInWati,diffStatus:[]};
+  localStorage.setItem('reconData', JSON.stringify(reconData));
+
+  document.getElementById('countTaken').textContent=matched.length;
+  document.getElementById('countRemaining').textContent=notInWati.length;
   document.getElementById('reconStats').innerHTML=`
-    <div class="stat-card c-green"><div class="stat-label">مأخوذة</div><div class="stat-value">${reconData.matched.length}</div></div>
-    <div class="stat-card c-yellow"><div class="stat-label">متبقية</div><div class="stat-value">${reconData.notInWati.length}</div></div>
-    <div class="stat-card c-red"><div class="stat-label">في الفيشي فقط</div><div class="stat-value">${reconData.notInSheet.length}</div></div>
-    <div class="stat-card c-purple"><div class="stat-label">حالة مختلفة</div><div class="stat-value">${reconData.diffStatus.length}</div></div>`;
+    <div class="stat-card c-green"><div class="stat-label">مأخوذة</div><div class="stat-value">${matched.length}</div></div>
+    <div class="stat-card c-yellow"><div class="stat-label">متبقية</div><div class="stat-value">${notInWati.length}</div></div>
+    <div class="stat-card c-red"><div class="stat-label">في الفيشي فقط</div><div class="stat-value">${notInSheet.length}</div></div>
+    <div class="stat-card c-purple"><div class="stat-label">حالة مختلفة</div><div class="stat-value">0</div></div>`;
   currentReconFilter='all';
   renderReconTable();
-  localStorage.setItem('reconData', JSON.stringify(reconData));
   document.getElementById('reconResults').style.display='block';
   document.getElementById('reconResults').scrollIntoView({behavior:'smooth'});
 }
-
 function filterRecon(type){
   currentReconFilter=type;
   document.getElementById('reconSearch').value='';
