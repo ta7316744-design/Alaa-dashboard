@@ -414,9 +414,17 @@ async function analyzeRecon(){
 }
 if(!allOrders.length){alert('حمّل الطلبات أولاً');return;}
   if(!sheetData.length){alert('ارفع الفيشي شيت أولاً');return;}
-  const iId=parseInt(document.getElementById('colId').value),iSt=parseInt(document.getElementById('colStatus').value),iAm=document.getElementById('colAmount').value,iNm=document.getElementById('colName').value;
   const watiMap={};allOrders.forEach(o=>{watiMap[String(o.id||'').trim()]=o;});
-  const sheetRows=sheetData.map(r=>({id:String(r[iId]||'').trim(),status:String(r[iSt]||'').trim(),amount:iAm!==''?parseFloat(r[iAm])||0:null,name:iNm!==''?String(r[iNm]||''):null})).filter(r=>r.id);
+const sheetRows=[];
+for(const row of sheetData){
+  for(const cell of row){
+    const val=String(cell||'').trim();
+    if(/^ORD-\d+$/i.test(val)){
+      sheetRows.push({id:val,status:'—',amount:null,name:null});
+      break;
+    }
+  }
+}
   reconData={matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
   sheetRows.forEach(sr=>{
     const wr=watiMap[sr.id];
