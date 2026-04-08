@@ -437,11 +437,13 @@ function deleteSheet(){
 }
 
 async function analyzeRecon(){
-  if(!allOrders.length){
-    try{const r=await fetch(`${API_ORDERS}?all=1`);const d=await r.json();allOrders=d.orders||[];}catch(e){}
-  }
-  if(!allOrders.length){alert('حمّل الطلبات أولاً');return;}
-  if(!sheetData.length){alert('ارفع الفيشي شيت أولاً');return;}
+let allOrdersForRecon=[];
+try{
+  const r=await fetch(`${API_ORDERS}?all=1`);
+  const d=await r.json();
+  allOrdersForRecon=d.orders||[];
+}catch(e){}
+if(!allOrdersForRecon.length){alert('تعذر جلب الطلبات');return;}
 
   const deliveredMap={};
 const returnedMap={};
