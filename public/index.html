@@ -458,20 +458,32 @@ allOrders.forEach(o=>{
   const returned=[...oldData.diffStatus];
 Object.entries(deliveredMap).forEach(([id,o])=>{
   if(sheetIds.has(id)){
-    matched.push({id,customer:o.customer,watiStatus:o.status,sheetStatus:'—'});
+    if(!oldMatchedIds.has(id)){
+      matched.push({id,customer:o.customer,watiStatus:o.status,sheetStatus:'—'});
+      oldMatchedIds.add(id);
+    }
+    notInWati.splice(notInWati.findIndex(x=>x.id===id),1);
   } else {
-    notInWati.push(o);
+    if(!oldMatchedIds.has(id)&&!notInWati.find(x=>x.id===id)){
+      notInWati.push(o);
+    }
   }
 });
 
 Object.entries(returnedMap).forEach(([id,o])=>{
   if(sheetIds.has(id)){
-    returned.push({id,customer:o.customer,watiStatus:o.status,sheetStatus:'راجع بعد توصيل'});
+    if(!oldReturnedIds.has(id)){
+      returned.push({id,customer:o.customer,watiStatus:o.status,sheetStatus:'راجع بعد توصيل'});
+      oldReturnedIds.add(id);
+    }
+    notInWati.splice(notInWati.findIndex(x=>x.id===id),1);
   }
 });
 
 sheetIds.forEach(id=>{
-  if(!deliveredMap[id]&&!returnedMap[id]) notInSheet.push({id,name:'—',status:'—'});
+  if(!deliveredMap[id]&&!returnedMap[id]&&!notInSheet.find(x=>x.id===id)){
+    notInSheet.push({id,name:'—',status:'—'});
+  }
 });
 
 reconData={matched,notInSheet,notInWati,diffStatus:returned};
