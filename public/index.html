@@ -447,7 +447,7 @@ if(!allOrdersForRecon.length){alert('تعذر جلب الطلبات');return;}
 
   const deliveredMap={};
 const returnedMap={};
-allOrders.forEach(o=>{
+allOrdersForRecon.forEach(o=>{
   const s=(o.status||'').toLowerCase();
   if(s.includes('return')||s.includes('راجع')||s.includes('مرتجع')){
     returnedMap[String(o.id||'').trim()]=o;
