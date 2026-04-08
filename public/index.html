@@ -449,11 +449,13 @@ allOrders.forEach(o=>{
     }
   }
 
-  const matched=[];
-const notInWati=[];
-const notInSheet=[];
-const returned=[];
-
+  const oldData=JSON.parse(localStorage.getItem('reconData')||'{"matched":[],"notInWati":[],"notInSheet":[],"diffStatus":[]}');
+  const oldMatchedIds=new Set(oldData.matched.map(r=>r.id));
+  const oldReturnedIds=new Set(oldData.diffStatus.map(r=>r.id));
+  const matched=[...oldData.matched];
+  const notInWati=[...oldData.notInWati];
+  const notInSheet=[...oldData.notInSheet];
+  const returned=[...oldData.diffStatus];
 Object.entries(deliveredMap).forEach(([id,o])=>{
   if(sheetIds.has(id)){
     matched.push({id,customer:o.customer,watiStatus:o.status,sheetStatus:'—'});
