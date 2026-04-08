@@ -428,12 +428,15 @@ async function analyzeRecon(){
   if(!sheetData.length){alert('ارفع الفيشي شيت أولاً');return;}
 
   const deliveredMap={};
-  allOrders.forEach(o=>{
-    const s=(o.status||'').toLowerCase();
-    if(s.includes('deliver')||s.includes('تسليم')||s.includes('مسلم')){
-      deliveredMap[String(o.id||'').trim()]=o;
-    }
-  });
+const returnedMap={};
+allOrders.forEach(o=>{
+  const s=(o.status||'').toLowerCase();
+  if(s.includes('return')||s.includes('راجع')||s.includes('مرتجع')){
+    returnedMap[String(o.id||'').trim()]=o;
+  } else if(s.includes('deliver')||s.includes('تسليم')||s.includes('مسلم')){
+    deliveredMap[String(o.id||'').trim()]=o;
+  }
+});
 
   const sheetIds=new Set();
   for(const row of sheetData){
