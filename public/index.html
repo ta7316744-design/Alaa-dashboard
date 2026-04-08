@@ -252,12 +252,10 @@ if(saved){
   savedSheetData=json;savedSheetName=savedName||'fiche.xlsx';
   sheetHeaders=json[0]||[];sheetData=json.slice(1).filter(r=>r.some(c=>c));
   document.getElementById('dropZone').style.display='none';
-  document.getElementById('reconFileInfo').style.display='block';
   document.getElementById('reconFileName').textContent=savedName||'fiche.xlsx';
   document.getElementById('reconFileRows').textContent=sheetData.length+' صف';
-  document.getElementById('colMap').style.display='block';
+  document.getElementById('reconFileActions').style.display='flex';
 }
-};
 function toggleAiDates(){
   const custom=document.getElementById('aiPeriod').value==='custom';
   document.getElementById('aiFromGroup').style.display=custom?'flex':'none';
