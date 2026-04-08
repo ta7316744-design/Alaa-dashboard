@@ -161,52 +161,6 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;h
   <div id="aiEmpty" class="empty"><div class="empty-icon">🤖</div><div>اضغط على "تحليل بالذكاء الاصطناعي" للبدء</div><div style="font-size:12px;margin-top:8px;color:var(--text3)">يحتاج بيانات WATI + Facebook معاً</div></div>
 </div>
 
-<!-- RECON -->
-<div class="page" id="page-recon">
-  <div id="reconUploadSection">
-    <div class="recon-upload" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <div class="upload-icon">📊</div>
-      <div class="upload-title">ارفع فيشي شيت شركة التوصيل</div>
-      <div class="upload-sub">اسحب وأفلت أو اضغط للاختيار — Excel / CSV</div>
-      <button class="btn-upload" onclick="event.stopPropagation()">اختر الملف</button>
-      <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" onchange="handleFile(event)" style="display:none"/>
-    </div>
-  </div>
-  <div id="reconFileInfo" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-      <div>
-        <span id="reconFileName" style="font-weight:700;color:var(--accent)"></span>
-        <span id="reconFileRows" style="font-size:12px;color:var(--text2);margin-right:10px"></span>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-primary" onclick="exportSheet()">⬇ تصدير الفيشي</button>
-        <button class="btn btn-gray" onclick="deleteSheet()">🗑 حذف الفيشي</button>
-      </div>
-    </div>
-  </div>
- <div class="col-map" id="colMap" style="display:none">
-    <button class="btn-analyze" onclick="analyzeRecon()">📊 تحليل وقارن</button>
-  </div>
-  <div id="reconResults" style="display:none">
-    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
-      <div class="fg" style="flex:1;min-width:200px">
-        <label>بحث برقم طلب</label>
-        <input type="text" id="reconSearch" placeholder="ORD-121134..." oninput="searchRecon()" style="width:100%"/>
-      </div>
-      <button class="btn btn-green" onclick="filterRecon('taken')" id="btnTaken">✅ مأخوذة (<span id="countTaken">0</span>)</button>
-      <button class="btn btn-gray" onclick="filterRecon('remaining')" id="btnRemaining">⏳ متبقية (<span id="countRemaining">0</span>)</button>
-      <button class="btn btn-gray" onclick="filterRecon('all')" id="btnAll">📋 الكل</button>
-      <button class="btn btn-green" onclick="exportReconCSV()">⬇ تصدير CSV</button>
-      <button class="btn btn-gray" onclick="resetRecon()" style="background:var(--red);color:#fff">🗑 إعادة تعيين</button>
-    </div>
-    <div class="stats-grid" id="reconStats"></div>
-    <div class="table-wrap">
-      <div class="table-header"><span class="table-title">نتائج المقارنة</span><span class="table-count" id="reconCount"></span></div>
-      <div id="reconTable"></div>
-    </div>
-  </div>
-</div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 const API_ORDERS='/api/orders', API_FB='/api/facebook', API_AI='/api/ai_analysis';
