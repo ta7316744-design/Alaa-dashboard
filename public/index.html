@@ -398,17 +398,18 @@ function handleFile(e){
   savedSheetName=file.name;
   const reader=new FileReader();
   reader.onload=ev=>{
-    const wb=XLSX.read(ev.target.result,{type:'binary'});const ws=wb.Sheets[wb.SheetNames[0]];const json=XLSX.utils.sheet_to_json(ws,{header:1});
-    sheetHeaders=json[0]||[];sheetData=json.slice(1).filter(r=>r.some(c=>c));
+    const wb=XLSX.read(ev.target.result,{type:'binary'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const json=XLSX.utils.sheet_to_json(ws,{header:1});
+    sheetHeaders=json[0]||[];
+    sheetData=json.slice(1).filter(r=>r.some(c=>c));
     savedSheetData=json;
-    localStorage.setItem('savedSheet', JSON.stringify(json));
-localStorage.setItem('savedSheetName', file.name);
+    localStorage.setItem('savedSheet',JSON.stringify(json));
+    localStorage.setItem('savedSheetName',file.name);
     document.getElementById('dropZone').style.display='none';
-    const fi=document.getElementById('reconFileInfo');
-    fi.style.display='block';
     document.getElementById('reconFileName').textContent=file.name;
     document.getElementById('reconFileRows').textContent=sheetData.length+' صف';
-    document.getElementById('colMap').style.display='block';
+    document.getElementById('reconFileActions').style.display='flex';
   };
   reader.readAsBinaryString(file);
 }
@@ -426,9 +427,15 @@ function deleteSheet(){
   sheetData=[];sheetHeaders=[];savedSheetData=[];savedSheetName='';
   localStorage.removeItem('savedSheet');
   localStorage.removeItem('savedSheetName');
+  localStorage.removeItem('reconData');
+  reconData={matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
   document.getElementById('dropZone').style.display='block';
-  document.getElementById('reconFileInfo').style.display='none';
-  document.getElementById('colMap').style.display='none';
+  document.getElementById('reconFileName').textContent='';
+  document.getElementById('reconFileRows').textContent='';
+  document.getElementById('reconFileActions').style.display='none';
+  document.getElementById('reconResults').style.display='none';
+  document.getElementById('countTaken').textContent='0';
+  document.getElementById('countRemaining').textContent='0';
 }
 
 async function analyzeRecon(){
