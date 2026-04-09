@@ -103,7 +103,7 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;h
 <div class="page active" id="page-orders">
   <div class="stats-grid">
     <div class="stat-card c-blue"><div class="stat-label">إجمالي الطلبات</div><div class="stat-value" id="s-total">—</div><div class="stat-sub">في الفترة</div></div>
-    <div class="stat-card c-green"><div class="stat-label">إجمالي المبيعات</div><div class="stat-value" id="s-amount">—</div><div class="stat-sub">دج</div></div>
+    <div class="stat-card c-green"><div class="stat-label">إجمالي المبيعات</div><div class="stat-value" id="s-amount">—</div><div class="stat-sub">د.ل</div></div>
     <div class="stat-card c-green"><div class="stat-label">موصّل</div><div class="stat-value" id="s-delivered">—</div><div class="stat-sub">طلب</div></div>
     <div class="stat-card c-yellow"><div class="stat-label">قيد التوصيل</div><div class="stat-value" id="s-pending">—</div><div class="stat-sub">طلب</div></div>
     <div class="stat-card c-red"><div class="stat-label">ملغي</div><div class="stat-value" id="s-cancelled">—</div><div class="stat-sub">طلب</div></div>
@@ -312,8 +312,7 @@ function renderStats(orders){
   const pending=orders.filter(o=>{const s=(o.status||'').toLowerCase();return s.includes('pend')||s.includes('transit')||s.includes('قيد')||s.includes('شحن');}).length;
   const cancelled=orders.filter(o=>{const s=(o.status||'').toLowerCase();return s.includes('cancel')||s.includes('إلغاء')||s.includes('ملغ');}).length;
   document.getElementById('s-total').textContent=fmtNum(total);
-  document.getElementById('s-amount').textContent=fmtNum(sum);
-  document.getElementById('s-delivered').textContent=fmtNum(delivered);
+  document.getElementById('s-amount').textContent=fmtNum(sum/exchangeRate);  document.getElementById('s-delivered').textContent=fmtNum(delivered);
   document.getElementById('s-pending').textContent=fmtNum(pending);
   document.getElementById('s-cancelled').textContent=fmtNum(cancelled);
   document.getElementById('s-rate').textContent=total>0?Math.round(delivered/total*100):0;
@@ -324,7 +323,7 @@ function badgeClass(s){s=(s||'').toLowerCase();if(s.includes('deliver')||s.inclu
 function renderTable(orders){
   document.getElementById('tableCount').textContent=fmtNum(orders.length)+' طلب';
   if(!orders.length){document.getElementById('tableBody').innerHTML='<div class="empty"><div class="empty-icon">📭</div><div>لا توجد طلبات</div></div>';return;}
-  const rows=orders.map(o=>`<tr><td style="font-weight:700;color:var(--accent)">${esc(o.id)}</td><td>${esc(o.customer)}</td><td style="direction:ltr;text-align:right">${esc(o.phone)}</td><td><span class="badge ${badgeClass(o.status)}">${esc(o.status)}</span></td><td style="font-weight:700">${parseFloat(o.amount)||0} دج</td><td>${esc(o.wilaya)}</td><td style="color:var(--text2)">${esc(o.date)}</td></tr>`).join('');
+  const rows=orders.map(o=>`<tr><td style="font-weight:700;color:var(--accent)">${esc(o.id)}</td><td>${esc(o.customer)}</td><td style="direction:ltr;text-align:right">${esc(o.phone)}</td><td><span class="badge ${badgeClass(o.status)}">${esc(o.status)}</span></td><td style="font-weight:700">${((parseFloat(o.amount)||0)/exchangeRate).toFixed(2)} دل</td><td>${esc(o.wilaya)}</td><td style="color:var(--text2)">${esc(o.date)}</td></tr>`).join('');
   document.getElementById('tableBody').innerHTML=`<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>رقم الطلب</th><th>الاسم</th><th>الهاتف</th><th>الحالة</th><th>المبلغ</th><th>الولاية</th><th>التاريخ</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
