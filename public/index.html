@@ -403,7 +403,7 @@ async function runAI(){
 }
 
 function setupDrop(){const zone=document.getElementById('dropZone');zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag');});zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag');handleFile({target:{files:e.dataTransfer.files}});});}
-
+let exchangeRate=parseFloat(localStorage.getItem('exchangeRate'))||8.26;
 let reconData={matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
 let currentReconFilter='all';
 let savedSheetData=[];
