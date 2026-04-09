@@ -157,11 +157,11 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;h
 </div>
   <div class="stats-grid" id="aiStats" style="display:none">
     <div class="stat-card c-red"><div class="stat-label">إنفاق إعلاني</div><div class="stat-value" id="ai-spend">—</div><div class="stat-sub">$</div></div>
-    <div class="stat-card c-green"><div class="stat-label">مبيعات WATI</div><div class="stat-value" id="ai-revenue">—</div><div class="stat-sub">دج</div></div>
+    <div class="stat-card c-green"><div class="stat-label">مبيعات WATI</div><div class="stat-value" id="ai-revenue">—</div><div class="stat-sub">د.ل</div></div>
     <div class="stat-card c-orange"><div class="stat-label">CPO</div><div class="stat-value" id="ai-cpo">—</div></div>
     <div class="stat-card c-purple"><div class="stat-label">ROAS</div><div class="stat-value" id="ai-roas">—</div></div>
     <div class="stat-card c-green"><div class="stat-label">نسبة التوصيل</div><div class="stat-value" id="ai-delivery">—</div><div class="stat-sub">%</div></div>
-    <div class="stat-card c-blue"><div class="stat-label">الربح الصافي</div><div class="stat-value" id="ai-profit">—</div><div class="stat-sub">دج</div></div>
+    <div class="stat-card c-blue"><div class="stat-label">الربح الصافي</div><div class="stat-value" id="ai-profit">—</div><div class="stat-sub">د.ل</div></div>
   </div>
   <div class="ai-box" id="aiBox" style="display:none">
     <div class="ai-header"><div class="ai-title">🤖 تحليل الذكاء الاصطناعي - DeepSeek</div><span id="aiTime" style="font-size:12px;color:var(--text3)"></span></div>
@@ -383,18 +383,18 @@ async function runAI(){
   if(!orders.length){try{const r=await fetch(`${API_ORDERS}?from=${from}&to=${to}`);const d=await r.json();orders=d.orders||[];}catch(e){}}
   if(!camps.length){try{const r=await fetch(`${API_FB}?from=${from}&to=${to}`);const d=await r.json();camps=d.campaigns||[];}catch(e){}}
   try{
-    const res=await fetch(API_AI,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({campaigns:camps,orders:orders,period:`آخر ${days} أيام`,question:document.getElementById('aiQuestion').value})});
+    const res=await fetch(API_AI,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({campaigns:camps,orders:orders,period:`آخر ${days} أيام`,question:document.getElementById('aiQuestion').value,currency:'دينار ليبي',exchangeRate:exchangeRate})});
     const data=await res.json();
     document.getElementById('aiLoading').style.display='none';
     document.getElementById('aiBtn').disabled=false;
     if(data.error&&!data.analysis){document.getElementById('aiEmpty').innerHTML=`<div class="empty-icon">⚠️</div><div>${data.error}</div>`;document.getElementById('aiEmpty').style.display='block';return;}
     const s=data.stats||{};
     document.getElementById('ai-spend').textContent='$'+(s.total_spend||0).toFixed(2);
-    document.getElementById('ai-revenue').textContent=fmtNum(s.total_revenue||0);
+    document.getElementById('ai-revenue').textContent=fmtNum((s.total_revenue||0)/exchangeRate);
     document.getElementById('ai-cpo').textContent='$'+(s.global_cpo||0).toFixed(2);
     document.getElementById('ai-roas').textContent=(s.global_roas||0).toFixed(2)+'x';
     document.getElementById('ai-delivery').textContent=(s.delivery_rate||0)+'%';
-    document.getElementById('ai-profit').textContent=fmtNum(s.profit||0);
+    document.getElementById('ai-profit').textContent=fmtNum((s.profit||0)/exchangeRate);
     document.getElementById('aiStats').style.display='grid';
     document.getElementById('aiResult').textContent=data.analysis||'لا يوجد تحليل';
     document.getElementById('aiTime').textContent=new Date().toLocaleTimeString('ar');
