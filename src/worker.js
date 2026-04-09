@@ -116,17 +116,21 @@ if (!url.searchParams.get('from') || (updated >= from_date && updated <= to_date
       const total_spend = campaigns.reduce((a,c)=>a+c.spend,0);
       const total_orders = orders.length;
       const total_revenue = orders.reduce((a,o)=>a+(parseFloat(o.amount)||0),0);
+      const exchangeRate = body.exchangeRate || 8.26;
+      const total_revenue_usd = total_revenue / exchangeRate;
+      const profit_usd = total_revenue_usd - total_spend;
+      const global_roas_real = total_spend > 0 ? Math.round(total_revenue_usd/total_spend*100)/100 : 0;
       const delivered = orders.filter(o=>/deliver|مسلم|تسليم/i.test(o.status||'')).length;
       const cancelled = orders.filter(o=>/cancel|ملغ|إلغاء/i.test(o.status||'')).length;
       const delivery_rate = total_orders>0?Math.round(delivered/total_orders*1000)/10:0;
       const global_cpo = total_orders>0?Math.round(total_spend/total_orders*100)/100:0;
-      const global_roas = total_spend>0?Math.round(total_revenue/total_spend*100)/100:0;
-      const profit = total_revenue - total_spend;
+      const global_roas = global_roas_real;
+      const profit = profit_usd;
       const camp_summary = campaigns.sort((a,b)=>b.spend-a.spend).slice(0,10).map(c=>`- ${c.name}: $${c.spend.toFixed(2)}, طلبات=${c.purchases}, CPO=$${c.cpo.toFixed(2)}, ROAS=${c.roas.toFixed(2)}`).join('\n');
       const question = body.question || '';
 const prompt = question
-  ? `أنت خبير تسويق رقمي. عندك هذه البيانات:\nالفترة: ${period}\nالإنفاق: $${total_spend.toFixed(2)} | الطلبات: ${total_orders} | المبيعات: ${total_revenue.toFixed(2)} دج\nالموصل: ${delivered} (${delivery_rate}%) | الملغي: ${cancelled}\nCPO: $${global_cpo.toFixed(2)} | ROAS: ${global_roas.toFixed(2)} | الربح: ${profit.toFixed(2)} دج\nالحملات:\n${camp_summary||'لا توجد بيانات'}\nأجب على هذا السؤال فقط باللغة العربية: ${question}`
-  : `أنت خبير تسويق رقمي. حلل البيانات وقدم توصيات باللغة العربية.\nالفترة: ${period}\nالإنفاق: $${total_spend.toFixed(2)} | الطلبات: ${total_orders} | المبيعات: ${total_revenue.toFixed(2)} دج\nالموصل: ${delivered} (${delivery_rate}%) | الملغي: ${cancelled}\nCPO: $${global_cpo.toFixed(2)} | ROAS: ${global_roas.toFixed(2)} | الربح: ${profit.toFixed(2)} دج\nالحملات:\n${camp_summary||'لا توجد بيانات'}\nاعطني:\n1. تقييم الأداء العام\n2. أفضل حملة وأسوأ حملة\n3. 3 توصيات عملية\n4. تحذير إن وجد`;
+  ? `أنت خبير تسويق رقمي. عندك هذه البيانات:\nالفترة: ${period}\nالإنفاق: $${total_spend.toFixed(2)} | الطلبات: ${total_orders} | المبيعات: ${total_revenue.toFixed(2)} دل\nالموصل: ${delivered} (${delivery_rate}%) | الملغي: ${cancelled}\nCPO: $${global_cpo.toFixed(2)} | ROAS: ${global_roas.toFixed(2)} | الربح: ${profit.toFixed(2)} دل\nالحملات:\n${camp_summary||'لا توجد بيانات'}\nأجب على هذا السؤال فقط باللغة العربية: ${question}`
+  : `أنت خبير تسويق رقمي. حلل البيانات وقدم توصيات باللغة العربية.\nالفترة: ${period}\nالإنفاق: $${total_spend.toFixed(2)} | الطلبات: ${total_orders} | المبيعات: ${total_revenue.toFixed(2)} دل\nالموصل: ${delivered} (${delivery_rate}%) | الملغي: ${cancelled}\nCPO: $${global_cpo.toFixed(2)} | ROAS: ${global_roas.toFixed(2)} | الربح: ${profit.toFixed(2)} دل\nالحملات:\n${camp_summary||'لا توجد بيانات'}\nاعطني:\n1. تقييم الأداء العام\n2. أفضل حملة وأسوأ حملة\n3. 3 توصيات عملية\n4. تحذير إن وجد`;
       let analysis = '', error_msg = '';
       try {
         const r = await fetch('https://api.deepseek.com/chat/completions', {
@@ -139,7 +143,7 @@ const prompt = question
         else if (data.error) error_msg = JSON.stringify(data.error);
       } catch(e) { error_msg = e.message; }
 
-      return new Response(JSON.stringify({ analysis, error: error_msg, stats: { total_spend, total_orders, total_revenue, delivered, cancelled, delivery_rate, global_cpo, global_roas, profit } }), {
+      return new Response(JSON.stringify({ analysis, error: error_msg, stats: { total_spend, total_orders, total_revenue: total_revenue_usd, delivered, cancelled, delivery_rate, global_cpo, global_roas: global_roas_real, profit: profit_usd } }), {
         headers: { ...cors, 'Content-Type': 'application/json' }
       });
     }
