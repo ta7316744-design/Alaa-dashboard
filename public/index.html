@@ -352,6 +352,13 @@ function renderAdsStats(camps){
   document.getElementById('a-clicks').textContent=fmtNum(clicks);
 }
 
+  function updateExchangeRate(val){
+  exchangeRate=parseFloat(val)||8.26;
+  localStorage.setItem('exchangeRate',exchangeRate);
+  applyFilters();
+  if(allCampaigns.length) renderAdsStats(allCampaigns);
+}
+  
 function renderCampaigns(camps){
   document.getElementById('campCount').textContent=camps.length+' حملة';
   if(!camps.length){document.getElementById('campBody').innerHTML='<div class="empty"><div class="empty-icon">📭</div><div>لا توجد حملات</div></div>';return;}
