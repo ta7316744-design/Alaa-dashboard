@@ -234,31 +234,11 @@ window.onload=()=>{
   document.getElementById('aiTo').value=fmt(today);
   let exchangeRate = parseFloat(localStorage.getItem('exchangeRate')) || 8.26;
   loadAll(); setupDrop();
-  setTimeout(()=>{
-  const totalDel=allOrders.filter(o=>{const s=(o.status||'').toLowerCase();return s.includes('deliver')||s.includes('تسليم')||s.includes('مسلم');}).length;
-  const taken=reconData.matched.length;
-  const ret=reconData.diffStatus.length;
-  const remaining=totalDel-taken-ret;
-  document.getElementById('reconStats').innerHTML=`
-    <div class="stat-card c-blue"><div class="stat-label">إجمالي الموصّلين</div><div class="stat-value">${totalDel}</div></div>
-    <div class="stat-card c-green"><div class="stat-label">مأخوذة</div><div class="stat-value">${taken}</div></div>
-    <div class="stat-card c-yellow"><div class="stat-label">متبقية</div><div class="stat-value">${remaining}</div></div>
-    <div class="stat-card c-orange"><div class="stat-label">راجع بعد توصيل</div><div class="stat-value">${ret}</div></div>`;
-  document.getElementById('countTaken').textContent=taken;
-  document.getElementById('countRemaining').textContent=remaining;
-},5000);
+  
   const savedRecon=localStorage.getItem('reconData');
 if(savedRecon){
   reconData=JSON.parse(savedRecon);
-  document.getElementById('countTaken').textContent=reconData.matched.length;
-  document.getElementById('countRemaining').textContent=reconData.notInWati.length;
-  document.getElementById('reconStats').innerHTML=`
-    <div class="stat-card c-green"><div class="stat-label">مأخوذة</div><div class="stat-value">${reconData.matched.length}</div></div>
-    <div class="stat-card c-yellow"><div class="stat-label">متبقية</div><div class="stat-value">${reconData.notInWati.length}</div></div>
-    <div class="stat-card c-red"><div class="stat-label">في الفيشي فقط</div><div class="stat-value">${reconData.notInSheet.length}</div></div>
-    <div class="stat-card c-orange"><div class="stat-label">راجع بعد توصيل</div><div class="stat-value">${reconData.diffStatus.length}</div></div>
-    `;
-  setTimeout(renderReconTable, 100);
+  updateReconStats();setTimeout(renderReconTable,100);
   document.getElementById('reconResults').style.display='block';
 }
   const saved=localStorage.getItem('savedSheet');
@@ -267,7 +247,6 @@ if(saved){
   const json=JSON.parse(saved);
   savedSheetData=json;savedSheetName=savedName||'fiche.xlsx';
   sheetHeaders=json[0]||[];sheetData=json.slice(1).filter(r=>r.some(c=>c));
-  document.getElementById('dropZone').style.display='none';
   document.getElementById('reconFileName').textContent=savedName||'fiche.xlsx';
   document.getElementById('reconFileRows').textContent=sheetData.length+' صف';
   document.getElementById('reconFileActions').style.display='flex';
