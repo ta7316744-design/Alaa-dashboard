@@ -246,7 +246,7 @@ window.onload=()=>{
     <div class="stat-card c-orange"><div class="stat-label">راجع بعد توصيل</div><div class="stat-value">${ret}</div></div>`;
   document.getElementById('countTaken').textContent=taken;
   document.getElementById('countRemaining').textContent=remaining;
-},3000);
+},5000);
   const savedRecon=localStorage.getItem('reconData');
 if(savedRecon){
   reconData=JSON.parse(savedRecon);
@@ -533,11 +533,11 @@ reconData={matched,notInSheet,notInWati,diffStatus:returned};
   localStorage.setItem('reconData', JSON.stringify(reconData));
 
   document.getElementById('countTaken').textContent=matched.length;
-  document.getElementById('countRemaining').textContent=notInWati.length;
+  document.getElementById('countRemaining').textContent=realRemaining;
   document.getElementById('reconStats').innerHTML=`
     <div class="stat-card c-green"><div class="stat-label">مأخوذة</div><div class="stat-value">${matched.length}</div></div>
-    <div class="stat-card c-yellow"><div class="stat-label">متبقية</div><div class="stat-value">${notInWati.length}</div></div>
-    <div class="stat-card c-red"><div class="stat-label">في الفيشي فقط</div><div class="stat-value">${notInSheet.length}</div></div>
+<div class="stat-card c-yellow"><div class="stat-label">متبقية</div><div class="stat-value">${realRemaining}</div></div>
+<div class="stat-card c-red"><div class="stat-label">في الفيشي فقط</div><div class="stat-value">${notInSheet.length}</div></div>
    <div class="stat-card c-orange"><div class="stat-label">راجع بعد توصيل</div><div class="stat-value">${returned.length}</div></div>
   `;
   currentReconFilter='all';
