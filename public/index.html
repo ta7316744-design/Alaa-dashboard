@@ -171,6 +171,7 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;h
   <div id="aiEmpty" class="empty"><div class="empty-icon">🤖</div><div>اضغط على "تحليل بالذكاء الاصطناعي" للبدء</div><div style="font-size:12px;margin-top:8px;color:var(--text3)">يحتاج بيانات WATI + Facebook معاً</div></div>
 </div>
 <!-- RECON -->
+  
 <div class="page" id="page-recon">
 
   <!-- شريط علوي: زر رفع صغير + اسم الفيشي -->
@@ -188,6 +189,11 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;h
     </div>
   </div>
 
+<div class="stat-card c-green" style="margin-bottom:20px;max-width:300px;">
+  <div class="stat-label">💰 صافي القيمة الإجمالي</div>
+  <div class="stat-value" id="safiValue">—</div>
+  <div class="stat-sub">دل</div>
+</div>
   <!-- النتائج -->
   <div id="reconResults">
 
@@ -234,9 +240,10 @@ window.onload=()=>{
   document.getElementById('aiTo').value=fmt(today);
   let exchangeRate = parseFloat(localStorage.getItem('exchangeRate')) || 8.26;
   loadAll(); setupDrop();
-  
+  const savedSafi=localStorage.getItem('totalSafi');
+  if(savedSafi) document.getElementById('safiValue').textContent=fmtNum(parseFloat(savedSafi)/exchangeRate)+' دل';
   const savedRecon=localStorage.getItem('reconData');
-if(savedRecon){
+  if(savedRecon){
   reconData=JSON.parse(savedRecon);
   updateReconStats();setTimeout(renderReconTable,100);
   document.getElementById('reconResults').style.display='block';
@@ -246,7 +253,24 @@ const savedName=localStorage.getItem('savedSheetName');
 if(saved){
   const json=JSON.parse(saved);
   savedSheetData=json;savedSheetName=savedName||'fiche.xlsx';
-  sheetHeaders=json[0]||[];sheetData=json.slice(1).filter(r=>r.some(c=>c));
+ sheetHeaders=json[0]||[];
+sheetData=json.slice(1).filter(r=>r.some(c=>c));
+
+// ابحث عن صافي القيمة
+let newSafi=0;
+for(let ri=0;ri<json.length;ri++){
+  for(let ci=0;ci<(json[ri]||[]).length;ci++){
+    if(String(json[ri][ci]||'').includes('صافي القيمة')){
+      const val=parseFloat((json[ri+1]||[])[ci]||0);
+      if(!isNaN(val)) newSafi=val;
+      break;
+    }
+  }
+}
+const oldSafi=parseFloat(localStorage.getItem('totalSafi')||0);
+const totalSafi=oldSafi+newSafi;
+localStorage.setItem('totalSafi',totalSafi);
+document.getElementById('safiValue').textContent=fmtNum(totalSafi/exchangeRate)+' دل';
   document.getElementById('reconFileName').textContent=savedName||'fiche.xlsx';
   document.getElementById('reconFileRows').textContent=sheetData.length+' صف';
   document.getElementById('reconFileActions').style.display='flex';
@@ -429,6 +453,8 @@ function deleteSheet(){
   localStorage.removeItem('savedSheetName');
   localStorage.removeItem('reconData');
   reconData={matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
+  localStorage.removeItem('totalSafi');
+  document.getElementById('safiValue').textContent='—';
   document.getElementById('dropZone').style.display='block';
   document.getElementById('reconFileName').textContent='';
   document.getElementById('reconFileRows').textContent='';
