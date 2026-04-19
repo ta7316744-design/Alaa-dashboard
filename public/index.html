@@ -256,16 +256,17 @@ if(saved){
  sheetHeaders=json[0]||[];
 sheetData=json.slice(1).filter(r=>r.some(c=>c));
 
-// ابحث عن صافي القيمة
 let newSafi=0;
-for(let ri=0;ri<json.length;ri++){
-  for(let ci=0;ci<(json[ri]||[]).length;ci++){
-    if(String(json[ri][ci]||'').includes('صافي القيمة')){
-      const val=parseFloat((json[ri+1]||[])[ci]||0);
-      if(!isNaN(val)) newSafi=val;
-      break;
+for(let ri=json.length-1;ri>=0;ri--){
+  const row=json[ri]||[];
+  for(let ci=0;ci<row.length;ci++){
+    const h=String(json[0]?.[ci]||'').trim();
+    if(h.includes('صافي القيمة')){
+      const val=parseFloat(row[ci]);
+      if(!isNaN(val)&&val>0){newSafi=val;break;}
     }
   }
+  if(newSafi>0) break;
 }
 const oldSafi=parseFloat(localStorage.getItem('totalSafi')||0);
 const totalSafi=oldSafi+newSafi;
