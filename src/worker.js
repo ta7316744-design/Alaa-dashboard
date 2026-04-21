@@ -36,7 +36,7 @@ export default {
       };
 
       let orders = [], page = 1;
-      while (page <= 100) {
+      while (page <= 200) {
         try {
           const r = await fetch(`https://api.wati.ly/orders?page=${page}&limit=50`, { headers });
           if (!r.ok) break;
