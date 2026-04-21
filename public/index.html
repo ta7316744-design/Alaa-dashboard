@@ -479,7 +479,7 @@ allOrdersForRecon.forEach(o=>{
   const s=(o.status||'').toLowerCase();
   if(s.includes('return')||s.includes('راجع')||s.includes('مرتجع')){
     returnedMap[String(o.id||'').trim()]=o;
-  } else if(s.includes('deliver')||s.includes('تسليم')||s.includes('مسلم')){
+} else if(s.includes('deliver')||s.includes('تسليم')||s.includes('مسلم')||s.includes('تم التوصيل')){  
     deliveredMap[String(o.id||'').trim()]=o;
   }
 });
