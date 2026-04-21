@@ -47,8 +47,8 @@ export default {
           for (const o of arr) {
             const updated = (o.createdUtc || '').slice(0, 10);
             const created = (o.createdUtc || '').slice(0, 10);
-if (!url.searchParams.get('from') || (updated >= from_date && updated <= to_date)) {
-              const c = o.customer || {}, addr = o.incomingShippingAddress || {};
+if (!url.searchParams.get('from') || url.searchParams.get('all') || (created >= from_date && created <= to_date)) {
+  const c = o.customer || {}, addr = o.incomingShippingAddress || {};
               orders.push({
                 id: o.trackingId || '—',
                 customer: (c.fullName || '—').trim(),
