@@ -411,7 +411,7 @@ async function runAI(){
   }catch(e){document.getElementById('aiLoading').style.display='none';document.getElementById('aiBtn').disabled=false;document.getElementById('aiEmpty').innerHTML=`<div class="empty-icon">⚠️</div><div>${e.message}</div>`;document.getElementById('aiEmpty').style.display='block';}
 }
 
-function setupDrop(){const zone=document.getElementById('dropZone');zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag');});zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag');handleFile({target:{files:e.dataTransfer.files}});});}
+function setupDrop(){}
 let exchangeRate=parseFloat(localStorage.getItem('exchangeRate'))||8.26;
 let reconData={matched:[],notInSheet:[],notInWati:[],diffStatus:[]};
 let currentReconFilter='all';
@@ -431,7 +431,6 @@ function handleFile(e){
     savedSheetData=json;
     localStorage.setItem('savedSheet',JSON.stringify(json));
     localStorage.setItem('savedSheetName',file.name);
-    document.getElementById('dropZone').style.display='none';
     document.getElementById('reconFileName').textContent=file.name;
     document.getElementById('reconFileRows').textContent=sheetData.length+' صف';
     document.getElementById('reconFileActions').style.display='flex';
