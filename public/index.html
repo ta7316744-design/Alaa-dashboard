@@ -534,8 +534,8 @@ sheetIds.forEach(id=>{
 });
 
   const totalDeliveredAll=allOrdersForRecon.filter(o=>{const s=(o.status||'').toLowerCase();return s.includes('deliver')||s.includes('تسليم')||s.includes('مسلم');}).length;
-const realRemaining=totalDeliveredAll-matched.length-returned.length;
-reconData={matched,notInSheet,notInWati,diffStatus:returned};
+  const realRemaining=totalDeliveredAll-matched.length;
+  reconData={matched,notInSheet,notInWati,diffStatus:returned};
   localStorage.setItem('reconData', JSON.stringify(reconData));
 
   document.getElementById('countTaken').textContent=matched.length;
